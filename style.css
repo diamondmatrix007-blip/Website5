@@ -1,0 +1,170 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Orbitron',sans-serif;
+}
+
+body{
+background:black;
+overflow:hidden;
+color:#00ffd5;
+height:100vh;
+}
+
+/* center text */
+.center{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+z-index:2;
+}
+
+h1{
+font-size:65px;
+letter-spacing:6px;
+text-shadow:0 0 25px #00ffd5;
+margin-bottom:40px;
+}
+
+/* tilt button */
+#enterBtn{
+padding:18px 60px;
+font-size:22px;
+background:rgba(0,255,213,0.08);
+border:1px solid #00ffd5;
+color:#00ffd5;
+border-radius:15px;
+cursor:pointer;
+backdrop-filter:blur(10px);
+transition:0.15s;
+transform-style:preserve-3d;
+}
+
+#enterBtn:hover{
+box-shadow:0 0 35px #00ffd5;
+background:rgba(0,255,213,0.18);
+}
+
+/* glowing cursor */
+#cursor{
+width:18px;
+height:18px;
+background:#00ffd5;
+position:fixed;
+border-radius:50%;
+pointer-events:none;
+box-shadow:0 0 15px #00ffd5,0 0 40px #00ffd5,0 0 80px #00ffd5;
+transform:translate(-50%,-50%);
+z-index:999;
+}
+
+/* canvas */
+#canvas{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:0;
+}
+
+/* LOGIN BOX */
+.loginBox{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(0.6);
+background:rgba(0,0,0,0.55);
+backdrop-filter:blur(20px);
+padding:50px;
+border-radius:20px;
+width:380px;
+text-align:center;
+border:1px solid rgba(0,255,213,0.3);
+box-shadow:0 0 60px rgba(0,255,213,0.25);
+opacity:0;
+pointer-events:none;
+transition:0.5s;
+z-index:5;
+}
+
+.loginBox.show{
+opacity:1;
+pointer-events:auto;
+transform:translate(-50%,-50%) scale(1);
+}
+
+.loginBox h2{
+margin-bottom:25px;
+text-shadow:0 0 15px #00ffd5;
+}
+
+.loginBox input{
+width:100%;
+padding:14px;
+margin:10px 0;
+background:rgba(0,255,213,0.05);
+border:1px solid #00ffd5;
+color:#00ffd5;
+border-radius:10px;
+outline:none;
+}
+
+.loginBtn{
+width:100%;
+padding:15px;
+margin-top:10px;
+background:#00ffd5;
+border:none;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.enter-btn{
+ position:relative;
+ z-index:9999;
+}
+
+.or{
+margin:20px 0;
+opacity:0.7;
+}
+
+.google,.facebook,.github{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.google{background:#db4437;color:white;}
+.facebook{background:#1877f2;color:white;}
+.github{background:#333;color:white;}
+
+.register{
+margin-top:15px;
+opacity:0.8;
+}
+
+.register span{
+color:#00ffd5;
+cursor:pointer;
+}
+
+#enterBtn{
+transition: transform 0.1s linear, box-shadow 0.2s;
+transform-style: preserve-3d;
+will-change: transform;
+}
+
+#enterBtn:hover{
+box-shadow:0 0 40px #00ffd5;
+}
+

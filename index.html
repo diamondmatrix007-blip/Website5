@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MatrixxKinoto</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="cursor"></div>
+<script src="script.js"></script>
+<html lang="en">
+<head>
+<style>
+
+/* particles canvas */
+canvas{
+ position:fixed;
+ top:0;
+ left:0;
+ z-index:-1;
+}
+
+body{
+    margin:0;
+    background:black;
+    overflow:hidden;
+    font-family:Orbitron, sans-serif;
+    color:#00ffcc;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    flex-direction:column;
+}
+
+/* Neon title */
+.title{
+    font-size:55px;
+    font-weight:bold;
+    text-shadow:0 0 20px #00ffcc, 0 0 40px #00ffcc;
+    animation: colorChange 3s infinite;
+    margin-bottom:40px;
+}
+
+@keyframes colorChange{
+    0%{color:#00ffcc;}
+    25%{color:#ff0000;}
+    50%{color:#fffb00;}
+    75%{color:#39ff14;}
+    100%{color:#ff00c8;}
+}
+
+/* Neon button */
+.enter-btn{
+    padding:18px 50px;
+    font-size:20px;
+    background:transparent;
+    border:2px solid #00ffcc;
+    color:#00ffcc;
+    border-radius:12px;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 0 15px #00ffcc;
+}
+
+.enter-btn:hover{
+    background:#00ffcc;
+    color:black;
+    box-shadow:0 0 40px #00ffcc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title">MATRIXxKINOTO</div>
+
+<button class="enter-btn" onclick="window.open('login.html','_self')">
+ENTER SYSTEM
+</button>
+
+<script>
+function enterSystem(){
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Entering...</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+background:black;
+overflow:hidden;
+font-family:Orbitron;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:#00ffe1;
+flex-direction:column;
+}
+
+.text{
+font-size:40px;
+text-shadow:0 0 25px #00ffe1;
+margin-bottom:30px;
+}
+
+.barBox{
+width:400px;
+height:18px;
+border:1px solid #00ffe1;
+}
+
+.bar{
+height:100%;
+width:0%;
+background:#00ffe1;
+box-shadow:0 0 20px #00ffe1;
+}
+</style>
+</head>
+
+<body>
+
+    <!-- FOLLOW GLOW CIRCLE -->
+<div id="followCircle"></div>
+
+<style>
+#followCircle{
+position:fixed;
+top:0;
+left:0;
+width:26px;
+height:26px;
+border-radius:50%;
+pointer-events:none;
+z-index:9999;
+
+/* glow style */
+background:rgba(0,255,225,0.15);
+border:1px solid #00ffe1;
+box-shadow:
+0 0 15px #00ffe1,
+0 0 35px #00ffe1,
+0 0 60px #00ffe1;
+
+transform:translate(-50%,-50%);
+backdrop-filter:blur(2px);
+}
+</style>
+
+<script>
+const circle = document.getElementById("followCircle");
+
+let mouseX = 0, mouseY = 0;
+let posX = 0, posY = 0;
+
+// track real cursor
+document.addEventListener("mousemove",(e)=>{
+mouseX = e.clientX;
+mouseY = e.clientY;
+});
+
+// ultra smooth 144hz follow with slight latency
+function animate(){
+posX += (mouseX - posX) * 0.12;   // latency strength
+posY += (mouseY - posY) * 0.12;
+
+circle.style.left = posX + "px";
+circle.style.top = posY + "px";
+
+requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+<div class="text" id="t">ENTERING USER TO MATRIXxKINOTO</div>
+
+<div class="barBox">
+<div class="bar" id="bar"></div>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+let name = urlParams.get("name") || "USER";
+
+document.getElementById("t").innerHTML =
+`ENTERING ${name} TO MATRIXxKINOTO`;
+
+let w=0;
+let i=setInterval(()=>{
+w++;
+document.getElementById("bar").style.width=w+"%";
+if(w>=100){
+clearInterval(i);
+window.location="website.html";
+}
+},20);
+</script>
+<script>
+// particles background
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let p=[];
+for(let i=0;i<120;i++){
+ p.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+ vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2});
+}
+
+function anim(){
+ ctx.fillStyle="rgba(0,0,0,0.3)";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="#00ffe1";
+ p.forEach(a=>{
+  a.x+=a.vx; a.y+=a.vy;
+  if(a.x<0||a.x>canvas.width)a.vx*=-1;
+  if(a.y<0||a.y>canvas.height)a.vy*=-1;
+  ctx.beginPath();
+  ctx.arc(a.x,a.y,2,0,6.28);
+  ctx.fill();
+ });
+ requestAnimationFrame(anim);
+}
+anim();
+
+</script>
+</body>
+</html>
