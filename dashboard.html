@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MATRIXxKINOTO</title>
 
-<!-- FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -13,30 +12,28 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family: 'Orbitron', sans-serif;
+font-family:Orbitron;
 cursor:none;
 }
 
 body{
-background:#000;
-overflow-x:hidden;
+background:black;
 color:white;
+overflow-x:hidden;
 }
 
-/* PARTICLES BACKGROUND */
-#particles{
+/* PARTICLES */
+#bg{
 position:fixed;
 width:100%;
 height:100%;
 z-index:-1;
-top:0;
-left:0;
 }
 
 /* HEADER */
 .header{
 text-align:center;
-font-size:28px;
+font-size:30px;
 padding:20px;
 letter-spacing:4px;
 color:#00ffe1;
@@ -46,25 +43,46 @@ text-shadow:0 0 20px #00ffe1;
 /* SIDEBAR */
 .sidebar{
 position:fixed;
-left:-240px;
+left:-260px;
 top:0;
-width:240px;
+width:260px;
 height:100%;
 background:#050505;
 border-right:1px solid #00ffe1;
-padding-top:80px;
+padding:80px 15px;
 transition:.4s;
 z-index:999;
 }
+.sidebar.active{ left:0; }
 
-.sidebar.active{
-left:0;
+.toggle{
+position:fixed;
+left:15px;
+top:15px;
+font-size:26px;
+color:#00ffe1;
+z-index:1000;
+cursor:pointer;
 }
 
-.sidebar button{
-display:block;
-width:85%;
-margin:15px auto;
+/* FORM */
+.formbox{
+margin-top:20px;
+display:none;
+}
+
+.formbox input,
+.formbox textarea{
+width:100%;
+margin-bottom:10px;
+padding:10px;
+background:black;
+border:1px solid #00ffe1;
+color:#00ffe1;
+}
+
+.formbox button{
+width:100%;
 padding:12px;
 background:black;
 border:1px solid #00ffe1;
@@ -72,27 +90,14 @@ color:#00ffe1;
 cursor:pointer;
 transition:.3s;
 }
-
-.sidebar button:hover{
+.formbox button:hover{
 background:#00ffe1;
 color:black;
 box-shadow:0 0 15px #00ffe1;
 }
 
-/* TOGGLE BUTTON */
-.toggle{
-position:fixed;
-left:10px;
-top:15px;
-font-size:26px;
-color:#00ffe1;
-cursor:pointer;
-z-index:1000;
-}
-
-/* MAIN CONTENT */
+/* MAIN POSTS */
 .main{
-margin-left:0;
 padding:30px;
 display:flex;
 flex-wrap:wrap;
@@ -100,20 +105,23 @@ gap:25px;
 justify-content:center;
 }
 
-/* POST BOX */
 .post{
-width:320px;
+width:330px;
 background:rgba(0,0,0,0.7);
 border:1px solid #00ffe1;
 padding:15px;
 box-shadow:0 0 20px #00ffe1;
 transition:.3s;
-cursor:pointer;
 }
-
 .post:hover{
 transform:scale(1.03);
 box-shadow:0 0 35px #00ffe1;
+}
+
+.post img{
+width:100%;
+margin-top:10px;
+border-radius:6px;
 }
 
 .uploader{
@@ -123,47 +131,11 @@ opacity:.7;
 
 .title{
 font-size:20px;
-margin:8px 0;
 color:#00ffe1;
+margin:6px 0;
 }
 
-.message{
-font-size:14px;
-opacity:.9;
-}
-
-.post img{
-width:100%;
-margin-top:10px;
-border-radius:6px;
-}
-
-/* POPUP */
-.popup{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%) scale(0);
-background:black;
-border:1px solid #00ffe1;
-padding:25px;
-width:60%;
-z-index:10000;
-box-shadow:0 0 40px #00ffe1;
-transition:.3s;
-}
-
-.popup.active{
-transform:translate(-50%,-50%) scale(1);
-}
-
-.close{
-float:right;
-cursor:pointer;
-color:#00ffe1;
-}
-
-/* CURSOR GLOW FOLLOW */
+/* CURSOR */
 .cursor{
 position:fixed;
 width:18px;
@@ -179,89 +151,81 @@ box-shadow:0 0 20px #00ffe1,0 0 40px #00ffe1;
 
 <body>
 
-<canvas id="particles"></canvas>
+<canvas id="bg"></canvas>
 
-<div class="toggle" onclick="toggleMenu()">☰</div>
-
-<div class="sidebar" id="sidebar">
-<button onclick="createPost()">Create Post</button>
-<button onclick="uploadImage()">Upload Image</button>
-</div>
-
+<div class="toggle" onclick="toggle()">☰</div>
 <div class="header">MATRIXxKINOTO</div>
 
-<div class="main" id="feed"></div>
+<!-- SIDEBAR -->
+<div class="sidebar" id="side">
 
-<div class="popup" id="popup">
-<span class="close" onclick="closePopup()">X</span>
-<div id="popupContent"></div>
+<button onclick="openForm()">➕ Create Post / Upload Image</button>
+
+<div class="formbox" id="formBox">
+<input type="text" id="title" placeholder="Enter title">
+<textarea id="message" placeholder="Enter message"></textarea>
+<input type="file" id="image">
+<button onclick="uploadPost()">UPLOAD</button>
 </div>
+
+</div>
+
+<!-- MAIN FEED -->
+<div class="main" id="feed"></div>
 
 <div class="cursor" id="cursor"></div>
 
 <script>
 /* SIDEBAR */
-function toggleMenu(){
-document.getElementById("sidebar").classList.toggle("active");
+function toggle(){
+document.getElementById("side").classList.toggle("active");
+}
+function openForm(){
+document.getElementById("formBox").style.display="block";
 }
 
-/* USER NAME FROM DISCORD LOGIN */
-let username = localStorage.getItem("discordUser") || "Anonymous";
+/* USERNAME (discord later) */
+let username = localStorage.getItem("discordUser") || "User";
 
-/* CREATE MESSAGE POST */
-function createPost(){
-let title = prompt("Enter title:");
-if(!title) return;
+/* UPLOAD POST */
+function uploadPost(){
+let title=document.getElementById("title").value;
+let msg=document.getElementById("message").value;
+let file=document.getElementById("image").files[0];
 
-let msg = prompt("Enter message:");
-if(!msg) return;
+if(!title){ alert("Enter title"); return; }
 
-addPost(title,msg,null);
-alert("Posted!");
+let reader=new FileReader();
+reader.onload=function(e){
+createPost(title,msg,e.target.result);
+};
+if(file) reader.readAsDataURL(file);
+else createPost(title,msg,null);
+
+document.getElementById("title").value="";
+document.getElementById("message").value="";
+document.getElementById("image").value="";
+alert("Uploaded successfully");
 }
 
-/* UPLOAD IMAGE */
-function uploadImage(){
-let title = prompt("Image title:");
-if(!title) return;
+function createPost(title,msg,img){
+let feed=document.getElementById("feed");
 
-let url = prompt("Paste image URL:");
-if(!url) return;
-
-addPost(title,"",url);
-alert("Uploaded!");
-}
-
-/* ADD POST */
-function addPost(title,msg,img){
-let feed = document.getElementById("feed");
-
-let div = document.createElement("div");
+let div=document.createElement("div");
 div.className="post";
-div.onclick = ()=>openPopup(title,msg,img);
 
 div.innerHTML=`
 <div class="uploader">Posted by ${username}</div>
 <div class="title">${title}</div>
-<div class="message">${msg}</div>
+<div>${msg}</div>
 ${img? `<img src="${img}">`:""}
 `;
 
 feed.prepend(div);
 }
 
-/* POPUP */
-function openPopup(t,m,i){
-let html=`<h2>${t}</h2><p>${m}</p>${i?`<img src="${i}" style="width:100%">`:""}`;
-document.getElementById("popupContent").innerHTML=html;
-document.getElementById("popup").classList.add("active");
-}
-function closePopup(){
-document.getElementById("popup").classList.remove("active");
-}
-
 /* PARTICLES */
-const canvas=document.getElementById("particles");
+const canvas=document.getElementById("bg");
 const ctx=canvas.getContext("2d");
 canvas.width=innerWidth;
 canvas.height=innerHeight;
@@ -270,8 +234,7 @@ let particles=[];
 for(let i=0;i<120;i++){
 particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2});
 }
-
-function animate(){
+function anim(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="#00ffe1";
 particles.forEach(p=>{
@@ -281,19 +244,14 @@ ctx.fill();
 p.y+=0.3;
 if(p.y>canvas.height)p.y=0;
 });
-requestAnimationFrame(animate);
+requestAnimationFrame(anim);
 }
-animate();
+anim();
 
-/* SMOOTH GLOW CURSOR FOLLOW */
+/* SMOOTH CURSOR */
 const cursor=document.getElementById("cursor");
 let cx=0,cy=0,tx=0,ty=0;
-
-document.addEventListener("mousemove",e=>{
-tx=e.clientX;
-ty=e.clientY;
-});
-
+document.addEventListener("mousemove",e=>{tx=e.clientX;ty=e.clientY;});
 function smooth(){
 cx+=(tx-cx)*0.15;
 cy+=(ty-cy)*0.15;
