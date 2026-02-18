@@ -1,306 +1,237 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MATRIXxKINOTO</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Orbitron;
-cursor:none;
-}
-
 body{
-background:black;
+background:#000;
 color:white;
+font-family:Arial;
+margin:0;
 overflow-x:hidden;
 }
 
-/* PARTICLES */
-#bg{
-position:fixed;
-width:100%;
-height:100%;
-z-index:-1;
-}
-
-/* HEADER */
-.header{
-text-align:center;
-font-size:30px;
-padding:20px;
-letter-spacing:4px;
-color:#00ffe1;
-text-shadow:0 0 20px #00ffe1;
-}
-
-/* SIDEBAR */
-.sidebar{
+/* sidebar */
+#sidebar{
 position:fixed;
 left:-260px;
 top:0;
 width:260px;
 height:100%;
 background:#050505;
-border-right:1px solid #00ffe1;
-padding:80px 15px;
-transition:.4s;
+box-shadow:0 0 20px cyan;
+transition:0.4s;
+padding:20px;
 z-index:999;
 }
-.sidebar.active{ left:0; }
 
-.toggle{
+#sidebar.show{left:0;}
+
+.menuBtn{
 position:fixed;
-left:15px;
-top:15px;
-font-size:26px;
-color:#00ffe1;
+top:20px;
+left:20px;
+font-size:28px;
+cursor:pointer;
 z-index:1000;
+}
+
+button{
+background:black;
+border:1px solid cyan;
+color:cyan;
+padding:10px;
+margin-top:10px;
+width:100%;
 cursor:pointer;
 }
 
-/* FORM */
-.formbox{
-margin-top:20px;
-display:none;
-}
-
-.formbox input,
-.formbox textarea{
+input,textarea{
 width:100%;
-margin-bottom:10px;
+margin-top:10px;
 padding:10px;
 background:black;
-border:1px solid #00ffe1;
-color:#00ffe1;
+border:1px solid cyan;
+color:white;
 }
 
-.formbox button{
-width:100%;
-padding:12px;
-background:black;
-border:1px solid #00ffe1;
-color:#00ffe1;
-cursor:pointer;
-transition:.3s;
-}
-.formbox button:hover{
-background:#00ffe1;
-color:black;
-box-shadow:0 0 15px #00ffe1;
-}
-
-/* MAIN POSTS */
-.main{
-padding:30px;
+#feed{
+margin-left:80px;
+padding:40px;
 display:flex;
 flex-wrap:wrap;
 gap:25px;
-justify-content:center;
 }
 
+/* post box */
 .post{
-width:330px;
-background:rgba(0,0,0,0.7);
-border:1px solid #00ffe1;
+border:1px solid cyan;
+box-shadow:0 0 15px cyan;
 padding:15px;
-box-shadow:0 0 20px #00ffe1;
-transition:.3s;
-}
-.post:hover{
-transform:scale(1.03);
-box-shadow:0 0 35px #00ffe1;
+width:320px;
+background:#050505;
 }
 
 .post img{
 width:100%;
 margin-top:10px;
-border-radius:6px;
-}
-
-.uploader{
-font-size:12px;
-opacity:.7;
+border-radius:8px;
 }
 
 .title{
 font-size:20px;
-color:#00ffe1;
-margin:6px 0;
+font-weight:bold;
+margin-top:5px;
 }
 
-/* CURSOR */
-.cursor{
+.user{
+font-size:12px;
+opacity:0.7;
+}
+
+/* glow follower */
+#follower{
 position:fixed;
-width:18px;
-height:18px;
+width:14px;
+height:14px;
 border-radius:50%;
-background:#00ffe1;
+background:cyan;
+box-shadow:0 0 20px cyan,0 0 40px cyan;
 pointer-events:none;
 z-index:9999;
-box-shadow:0 0 20px #00ffe1,0 0 40px #00ffe1;
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="bg"></canvas>
+<div class="menuBtn" onclick="toggleMenu()">☰</div>
 
-<div class="toggle" onclick="toggle()">☰</div>
-<div class="header">MATRIXxKINOTO</div>
+<div id="sidebar">
+<h2>Create Post</h2>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="side">
-
-<button onclick="openForm()">➕ Create Post / Upload Image</button>
-
-<div class="formbox" id="formBox">
-<input type="text" id="title" placeholder="Enter title">
-<textarea id="message" placeholder="Enter message"></textarea>
+<input id="title" placeholder="Title">
+<textarea id="message" placeholder="Message"></textarea>
 <input type="file" id="image">
+
 <button onclick="uploadPost()">UPLOAD</button>
 </div>
 
-</div>
-
-<!-- MAIN FEED -->
-<div class="main" id="feed"></div>
-
-<div class="cursor" id="cursor"></div>
+<div id="feed"></div>
+<div id="follower"></div>
 
 <script>
-/* SIDEBAR */
-function toggle(){
-document.getElementById("side").classList.toggle("active");
-}
-function openForm(){
-document.getElementById("formBox").style.display="block";
-}
-
-/* USERNAME */
-let username = localStorage.getItem("discordUser") || "User";
-
-/* LOAD OLD POSTS ON OPEN */
-window.onload = function(){
-let saved = JSON.parse(localStorage.getItem("matrixPosts")) || [];
-saved.forEach(p => createPost(p.title,p.msg,p.img,false));
-}
-
-/* UPLOAD POST */
-function uploadPost(){
-let title=document.getElementById("title").value;
-let msg=document.getElementById("message").value;
-let file=document.getElementById("image").files[0];
-
-if(!title){ alert("Enter title"); return; }
-
-let reader=new FileReader();
-reader.onload=function(e){
-savePost(title,msg,e.target.result);
+// firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAbV7OHp1-mroEGnprfW4rcddOpVjE9U9k",
+  authDomain: "matrixxkinoto-1d31c.firebaseapp.com",
+  projectId: "matrixxkinoto-1d31c",
+  storageBucket: "matrixxkinoto-1d31c.firebasestorage.app",
+  messagingSenderId: "480949525974",
+  appId: "1:480949525974:web:4eef38de95a3b2628cd877",
 };
-if(file) reader.readAsDataURL(file);
-else savePost(title,msg,null);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-document.getElementById("title").value="";
-document.getElementById("message").value="";
-document.getElementById("image").value="";
-alert("Uploaded permanently 🔥");
+// get discord user
+const username = localStorage.getItem("discordUser") || "Unknown";
+
+// sidebar
+function toggleMenu(){
+document.getElementById("sidebar").classList.toggle("show");
 }
 
-/* SAVE TO STORAGE */
-function savePost(title,msg,img){
-let posts = JSON.parse(localStorage.getItem("matrixPosts")) || [];
+// upload image to cloudinary
+async function uploadImage(file){
+const formData = new FormData();
+formData.append("file",file);
+formData.append("upload_preset","matrixx"); // we create next if needed
 
-let newPost = {title,msg,img};
-posts.unshift(newPost);
-
-localStorage.setItem("matrixPosts", JSON.stringify(posts));
-createPost(title,msg,img,true);
-}
-
-/* CREATE POST UI */
-function createPost(title,msg,img,saveIndex=true){
-let feed=document.getElementById("feed");
-
-let div=document.createElement("div");
-div.className="post";
-
-let index = 0;
-
-div.innerHTML=`
-<div class="uploader">Posted by ${username}</div>
-<div class="title">${title}</div>
-<div>${msg}</div>
-${img? `<img src="${img}">`:""}
-<button onclick="deletePost(this)" style="
-margin-top:10px;
-background:black;
-border:1px solid red;
-color:red;
-padding:6px 10px;
-cursor:pointer;">Delete</button>
-`;
-
-feed.prepend(div);
-}
-
-/* DELETE POST */
-function deletePost(btn){
-if(!confirm("Delete this post forever?")) return;
-
-let postDiv = btn.parentElement;
-let title = postDiv.querySelector(".title").innerText;
-
-let posts = JSON.parse(localStorage.getItem("matrixPosts")) || [];
-posts = posts.filter(p => p.title !== title);
-
-localStorage.setItem("matrixPosts", JSON.stringify(posts));
-postDiv.remove();
-}
-
-/* PARTICLES */
-const canvas=document.getElementById("bg");
-const ctx=canvas.getContext("2d");
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-
-let particles=[];
-for(let i=0;i<120;i++){
-particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2});
-}
-function anim(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle="#00ffe1";
-particles.forEach(p=>{
-ctx.beginPath();
-ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-ctx.fill();
-p.y+=0.3;
-if(p.y>canvas.height)p.y=0;
+const res = await fetch("https://api.cloudinary.com/v1_1/dctoowkot/image/upload",{
+method:"POST",
+body:formData
 });
+
+const data = await res.json();
+return data.secure_url;
+}
+
+// upload post
+async function uploadPost(){
+const title=document.getElementById("title").value;
+const msg=document.getElementById("message").value;
+const file=document.getElementById("image").files[0];
+
+let imgURL="";
+
+if(file){
+imgURL=await uploadImage(file);
+}
+
+await db.collection("posts").add({
+title:title,
+message:msg,
+image:imgURL,
+user:username,
+uid:username,
+time:Date.now()
+});
+
+alert("Uploaded 🔥");
+}
+
+// load posts realtime
+db.collection("posts").orderBy("time","desc")
+.onSnapshot(snapshot=>{
+document.getElementById("feed").innerHTML="";
+snapshot.forEach(doc=>{
+const p=doc.data();
+
+let del="";
+if(p.uid===username){
+del=`<button onclick="deletePost('${doc.id}')">Delete</button>`;
+}
+
+document.getElementById("feed").innerHTML+=`
+<div class="post">
+<div class="user">${p.user}</div>
+<div class="title">${p.title}</div>
+<div>${p.message}</div>
+${p.image?`<img src="${p.image}">`:""}
+${del}
+</div>
+`;
+});
+});
+
+// delete
+function deletePost(id){
+db.collection("posts").doc(id).delete();
+}
+
+// ultra smooth follower
+const f=document.getElementById("follower");
+let x=0,y=0;
+let mx=0,my=0;
+
+document.addEventListener("mousemove",e=>{
+mx=e.clientX;
+my=e.clientY;
+});
+
+function anim(){
+x+=(mx-x)*0.18;
+y+=(my-y)*0.18;
+f.style.left=x+"px";
+f.style.top=y+"px";
 requestAnimationFrame(anim);
 }
 anim();
-
-/* SMOOTH CURSOR */
-const cursor=document.getElementById("cursor");
-let cx=0,cy=0,tx=0,ty=0;
-document.addEventListener("mousemove",e=>{tx=e.clientX;ty=e.clientY;});
-function smooth(){
-cx+=(tx-cx)*0.15;
-cy+=(ty-cy)*0.15;
-cursor.style.left=cx+"px";
-cursor.style.top=cy+"px";
-requestAnimationFrame(smooth);
-}
-smooth();
 </script>
 
 </body>
