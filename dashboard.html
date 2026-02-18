@@ -1,283 +1,278 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>MATRIXxKINOTO</title>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- Particles -->
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
 
 <style>
 body{
-margin:0;
-background:black;
-color:white;
-font-family:Arial;
-overflow-x:hidden;
+    margin:0;
+    background:#000;
+    font-family:Orbitron;
+    color:white;
+    overflow-x:hidden;
 }
 
-/* PARTICLES */
-#particles-js{
-position:fixed;
-width:100%;
-height:100%;
-z-index:-1;
+/* ===== INTRO LOGO ===== */
+#introLogo{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:70px;
+    letter-spacing:8px;
+    opacity:.08;
+    transition:1.2s;
+    pointer-events:none;
 }
 
-/* SIDEBAR */
+#introLogo.top{
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:28px;
+    opacity:.35;
+}
+
+/* ===== SIDEBAR ===== */
+#menuBtn{
+    position:fixed;
+    top:20px;
+    left:20px;
+    font-size:26px;
+    cursor:pointer;
+    z-index:999;
+}
+
 #sidebar{
-position:fixed;
-left:-280px;
-top:0;
-width:280px;
-height:100%;
-background:#070707;
-box-shadow:0 0 25px red;
-transition:0.4s;
-padding:20px;
-z-index:1000;
+    position:fixed;
+    left:-260px;
+    top:0;
+    width:260px;
+    height:100%;
+    background:#070707;
+    border-right:1px solid #ff000055;
+    transition:.4s;
+    padding:20px;
 }
 
-#sidebar.show{
-left:0;
+#sidebar.show{ left:0; }
+
+.input{
+    width:100%;
+    margin-top:10px;
+    background:#000;
+    border:1px solid red;
+    color:white;
+    padding:10px;
 }
 
-.menuBtn{
-position:fixed;
-top:20px;
-left:20px;
-font-size:28px;
-cursor:pointer;
-z-index:1200;
-color:red;
+.btn{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    background:red;
+    border:none;
+    color:white;
+    cursor:pointer;
 }
 
-/* INPUTS */
-input,textarea{
-width:100%;
-margin-top:12px;
-padding:12px;
-background:black;
-border:1px solid red;
-color:white;
-outline:none;
+/* ===== POSTS ===== */
+#posts{
+    max-width:900px;
+    margin:120px auto;
 }
 
-button{
-background:black;
-border:1px solid red;
-color:red;
-padding:12px;
-margin-top:15px;
-width:100%;
-cursor:pointer;
-transition:0.3s;
-}
-
-button:hover{
-background:red;
-color:black;
-}
-
-/* FEED */
-#feed{
-padding:80px;
-display:flex;
-flex-wrap:wrap;
-gap:30px;
-justify-content:center;
-}
-
-/* POST BOX */
 .post{
-width:340px;
-background:#060606;
-border:1px solid red;
-box-shadow:0 0 25px rgba(255,0,0,0.6);
-padding:18px;
-border-radius:12px;
-transition:0.3s;
-}
-
-.post:hover{
-transform:scale(1.03);
-box-shadow:0 0 40px red;
+    border:1px solid #ff000044;
+    box-shadow:0 0 25px #ff000033;
+    padding:20px;
+    margin-bottom:40px;
+    border-radius:14px;
+    background:#050505;
 }
 
 .post img{
-width:100%;
-margin-top:12px;
-border-radius:10px;
+    max-width:100%;
+    border-radius:10px;
+    margin-top:10px;
 }
 
-.user{
-font-size:12px;
-opacity:0.7;
-color:#ff4d4d;
+.name{font-size:12px;opacity:.6}
+.title{font-size:26px;margin-top:4px}
+
+.delete{
+    margin-top:10px;
+    background:black;
+    border:1px solid red;
+    color:red;
+    padding:6px 12px;
+    cursor:pointer;
 }
 
-.title{
-font-size:20px;
-margin-top:6px;
-color:red;
-font-weight:bold;
+/* ===== PARTICLES ===== */
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:-1;
 }
 
-/* FOLLOW CURSOR */
+/* ===== FOLLOW CURSOR ===== */
 #follower{
-position:fixed;
-width:14px;
-height:14px;
-border-radius:50%;
-background:red;
-box-shadow:0 0 15px red,0 0 35px red;
-pointer-events:none;
-z-index:9999;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    position:fixed;
+    pointer-events:none;
+    background:red;
+    box-shadow:0 0 20px red,0 0 40px red;
+    z-index:9999;
 }
 </style>
 </head>
 
 <body>
 
-<div id="particles-js"></div>
-
-<div class="menuBtn" onclick="toggleMenu()">☰</div>
-
-<!-- SIDEBAR -->
-<div id="sidebar">
-<h2 style="color:red">Create Post</h2>
-
-<input id="title" placeholder="Title">
-<textarea id="message" placeholder="Message"></textarea>
-<input type="file" id="image">
-
-<button onclick="uploadPost()">UPLOAD</button>
-</div>
-
-<!-- FEED -->
-<div id="feed"></div>
+<canvas id="particles"></canvas>
 <div id="follower"></div>
 
+<div id="introLogo">MATRIXxKINOTO</div>
+
+<div id="menuBtn">☰</div>
+
+<div id="sidebar">
+<h3>Create Post</h3>
+<input id="title" class="input" placeholder="Title">
+<textarea id="msg" class="input" placeholder="Message"></textarea>
+<input type="file" id="img" class="input">
+<button class="btn" onclick="createPost()">UPLOAD</button>
+</div>
+
+<div id="posts"></div>
+
 <script>
-/* FIREBASE CONFIG */
+/* ===== FIREBASE CONFIG ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyAbV7OHp1-mroEGnprfW4rcddOpVjE9U9k",
   authDomain: "matrixxkinoto-1d31c.firebaseapp.com",
   projectId: "matrixxkinoto-1d31c",
-  storageBucket: "matrixxkinoto-1d31c.firebasestorage.app",
-  messagingSenderId: "480949525974",
-  appId: "1:480949525974:web:4eef38de95a3b2628cd877",
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* USER FROM DISCORD LOGIN */
-const username = localStorage.getItem("discordUser") || "Unknown";
+/* ===== USER ===== */
+let username = localStorage.getItem("discordName") || "Anonymous";
 
-/* SIDEBAR */
-function toggleMenu(){
-document.getElementById("sidebar").classList.toggle("show");
+/* ===== SIDEBAR ===== */
+menuBtn.onclick=()=>{
+ sidebar.classList.toggle("show");
 }
 
-/* UPLOAD IMAGE CLOUDINARY */
-async function uploadImage(file){
-const formData = new FormData();
-formData.append("file",file);
-formData.append("upload_preset","matrixx");
+/* ===== INTRO MOVE TO TOP ===== */
+setTimeout(()=>{
+ introLogo.classList.add("top");
+},1800);
 
-const res = await fetch("https://api.cloudinary.com/v1_1/dctoowkot/image/upload",{
-method:"POST",
-body:formData
-});
-const data = await res.json();
-return data.secure_url;
-}
+/* ===== CREATE POST ===== */
+async function createPost(){
+let title=document.getElementById("title").value;
+let msg=document.getElementById("msg").value;
+let file=document.getElementById("img").files[0];
 
-/* CREATE POST */
-async function uploadPost(){
-const title=document.getElementById("title").value;
-const msg=document.getElementById("message").value;
-const file=document.getElementById("image").files[0];
-
-let imgURL="";
+let imageURL="";
 
 if(file){
-imgURL=await uploadImage(file);
+let data=new FormData();
+data.append("file",file);
+data.append("upload_preset","matrixpreset");
+
+let res=await fetch("https://api.cloudinary.com/v1_1/dctoowkot/image/upload",{method:"POST",body:data});
+let json=await res.json();
+imageURL=json.secure_url;
 }
 
 await db.collection("posts").add({
-title:title,
-message:msg,
-image:imgURL,
-user:username,
-uid:username,
+title,msg,imageURL,
+name:username,
 time:Date.now()
 });
-
-alert("Uploaded 🔥");
 }
 
-/* REALTIME GLOBAL POSTS */
+/* ===== LOAD POSTS ===== */
 db.collection("posts").orderBy("time","desc")
-.onSnapshot(snapshot=>{
-document.getElementById("feed").innerHTML="";
+.onSnapshot(snap=>{
+posts.innerHTML="";
+snap.forEach(doc=>{
+let p=doc.data();
 
-snapshot.forEach(doc=>{
-const p=doc.data();
+let div=document.createElement("div");
+div.className="post";
 
-let del="";
-/* ONLY UPLOADER CAN DELETE */
-if(p.uid===username){
-del=`<button onclick="deletePost('${doc.id}')">Delete</button>`;
-}
-
-document.getElementById("feed").innerHTML+=`
-<div class="post">
-<div class="user">Posted by: ${p.user}</div>
-<div class="title">${p.title}</div>
-<div>${p.message}</div>
-${p.image?`<img src="${p.image}">`:""}
-${del}
-</div>
+div.innerHTML=`
+<div class=name>${p.name}</div>
+<div class=title>${p.title||""}</div>
+<div>${p.msg||""}</div>
+${p.imageURL?`<img src="${p.imageURL}">`:""}
+${p.name===username?`<button class=delete onclick="del('${doc.id}')">DELETE</button>`:""}
 `;
+
+posts.appendChild(div);
 });
 });
 
-/* DELETE */
-function deletePost(id){
+/* delete */
+function del(id){
 db.collection("posts").doc(id).delete();
 }
 
-/* PARTICLES RED */
-tsParticles.load("particles-js", {
-particles:{
-number:{value:80},
-color:{value:"#ff0000"},
-links:{enable:true,color:"#ff0000"},
-move:{enable:true,speed:1},
-size:{value:2}
-},
-background:{color:"black"}
+/* ===== PARTICLES ===== */
+let c=document.getElementById("particles");
+let ctx=c.getContext("2d");
+c.width=innerWidth;
+c.height=innerHeight;
+let pts=[];
+for(let i=0;i<80;i++){
+pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:.4-Math.random(),vy:.4-Math.random()});
+}
+function draw(){
+ctx.clearRect(0,0,c.width,c.height);
+pts.forEach(p=>{
+p.x+=p.vx;p.y+=p.vy;
+ctx.fillStyle="red";
+ctx.fillRect(p.x,p.y,2,2);
+pts.forEach(p2=>{
+let d=Math.hypot(p.x-p2.x,p.y-p2.y);
+if(d<120){
+ctx.strokeStyle="rgba(255,0,0,.15)";
+ctx.beginPath();
+ctx.moveTo(p.x,p.y);
+ctx.lineTo(p2.x,p2.y);
+ctx.stroke();
+}
 });
+});
+requestAnimationFrame(draw);
+}
+draw();
 
-/* SMOOTH FOLLOWER */
-const f=document.getElementById("follower");
-let x=0,y=0,mx=0,my=0;
-
+/* ===== SMOOTH FOLLOW CURSOR ===== */
+let fx=0,fy=0,tx=0,ty=0;
 document.addEventListener("mousemove",e=>{
-mx=e.clientX;
-my=e.clientY;
+tx=e.clientX;
+ty=e.clientY;
 });
-
 function anim(){
-x+=(mx-x)*0.15;
-y+=(my-y)*0.15;
-f.style.left=x+"px";
-f.style.top=y+"px";
+fx+=(tx-fx)*0.15;
+fy+=(ty-fy)*0.15;
+follower.style.left=fx+"px";
+follower.style.top=fy+"px";
 requestAnimationFrame(anim);
 }
 anim();
