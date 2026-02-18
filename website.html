@@ -112,6 +112,12 @@ html,body{
     transition: transform 0.05s linear;
     mix-blend-mode: screen;
 }
+
+.tilt{
+    transform-style: preserve-3d;
+    transition: transform 0.15s linear;
+}
+
 </style>
 
 
@@ -124,7 +130,7 @@ html,body{
 <canvas id="bg"></canvas>
 <div class="cursor" id="cursor"></div>
 
-<div class="container">
+<div class="container tilt">
     <h1>MATRIXxKINOTO</h1>
 
     <img id="avatar" class="avatar" src="" style="display:none">
@@ -230,6 +236,27 @@ function animate(){
     requestAnimationFrame(animate);
 }
 animate();
+</script>
+
+<script>
+const panel = document.querySelector(".tilt");
+
+document.addEventListener("mousemove", (e)=>{
+    const x = (window.innerWidth / 2 - e.clientX) / 25;
+    const y = (window.innerHeight / 2 - e.clientY) / 25;
+
+    panel.style.transform = `
+        translate(-50%,-50%)
+        rotateY(${x}deg)
+        rotateX(${-y}deg)
+        scale(1.02)
+    `;
+});
+
+// reset when mouse leaves
+document.addEventListener("mouseleave", ()=>{
+    panel.style.transform = "translate(-50%,-50%) rotateY(0deg) rotateX(0deg)";
+});
 </script>
 
 </body>
