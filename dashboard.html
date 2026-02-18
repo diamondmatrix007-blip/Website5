@@ -184,8 +184,14 @@ function openForm(){
 document.getElementById("formBox").style.display="block";
 }
 
-/* USERNAME (discord later) */
+/* USERNAME */
 let username = localStorage.getItem("discordUser") || "User";
+
+/* LOAD OLD POSTS ON OPEN */
+window.onload = function(){
+let saved = JSON.parse(localStorage.getItem("matrixPosts")) || [];
+saved.forEach(p => createPost(p.title,p.msg,p.img,false));
+}
 
 /* UPLOAD POST */
 function uploadPost(){
@@ -197,31 +203,66 @@ if(!title){ alert("Enter title"); return; }
 
 let reader=new FileReader();
 reader.onload=function(e){
-createPost(title,msg,e.target.result);
+savePost(title,msg,e.target.result);
 };
 if(file) reader.readAsDataURL(file);
-else createPost(title,msg,null);
+else savePost(title,msg,null);
 
 document.getElementById("title").value="";
 document.getElementById("message").value="";
 document.getElementById("image").value="";
-alert("Uploaded successfully");
+alert("Uploaded permanently 🔥");
 }
 
-function createPost(title,msg,img){
+/* SAVE TO STORAGE */
+function savePost(title,msg,img){
+let posts = JSON.parse(localStorage.getItem("matrixPosts")) || [];
+
+let newPost = {title,msg,img};
+posts.unshift(newPost);
+
+localStorage.setItem("matrixPosts", JSON.stringify(posts));
+createPost(title,msg,img,true);
+}
+
+/* CREATE POST UI */
+function createPost(title,msg,img,saveIndex=true){
 let feed=document.getElementById("feed");
 
 let div=document.createElement("div");
 div.className="post";
+
+let index = 0;
 
 div.innerHTML=`
 <div class="uploader">Posted by ${username}</div>
 <div class="title">${title}</div>
 <div>${msg}</div>
 ${img? `<img src="${img}">`:""}
+<button onclick="deletePost(this)" style="
+margin-top:10px;
+background:black;
+border:1px solid red;
+color:red;
+padding:6px 10px;
+cursor:pointer;">Delete</button>
 `;
 
 feed.prepend(div);
+}
+
+/* DELETE POST */
+function deletePost(btn){
+if(!confirm("Delete this post forever?")) return;
+
+let postDiv = btn.parentElement;
+let title = postDiv.querySelector(".title").innerText;
+
+let posts = JSON.parse(localStorage.getItem("matrixPosts")) || [];
+posts = posts.filter(p => p.title !== title);
+
+localStorage.setItem("matrixPosts", JSON.stringify(posts));
+postDiv.remove();
 }
 
 /* PARTICLES */
