@@ -74,19 +74,6 @@ html,body{
     box-shadow:0 0 35px cyan;
 }
 
-/* ===== GLOW CURSOR ===== */
-.cursor{
-    position:fixed;
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    background:cyan;
-    box-shadow:0 0 20px cyan,0 0 40px #6a00ff;
-    pointer-events:none;
-    z-index:9999;
-    transform:translate(-50%,-50%);
-}
-
 /* music btn */
 .music{
     position:fixed;
@@ -100,6 +87,34 @@ html,body{
     box-shadow:0 0 10px cyan;
     z-index:10;
 }
+
+/* follow glow cursor */
+.follow-cursor{
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+
+    background: radial-gradient(circle,
+    rgba(0,255,170,1) 0%,
+    rgba(0,255,170,0.6) 40%,
+    rgba(0,255,170,0) 70%);
+
+    box-shadow:
+    0 0 10px #00ffaa,
+    0 0 20px #00ffaa,
+    0 0 35px #00ffaa;
+
+    transform: translate(-50%, -50%);
+    transition: transform 0.05s linear;
+    mix-blend-mode: screen;
+}
+</style>
+
+
+
 </style>
 </head>
 
@@ -140,12 +155,6 @@ function toggleMusic(){
  if(m.paused){m.play()} else{m.pause()}
 }
 
-/* ===== CURSOR ===== */
-const cursor=document.getElementById("cursor");
-document.addEventListener("mousemove",(e)=>{
- cursor.style.left=e.clientX+"px";
- cursor.style.top=e.clientY+"px";
-});
 
 /* ===== PARTICLES FULL BLACK FIX ===== */
 const canvas=document.getElementById("bg");
@@ -192,6 +201,34 @@ draw();
 function enterSite(){
  alert("Welcome to Matrix 😈");
 }
+</script>
+<div class="follow-cursor"></div>
+
+<script>
+const cursor = document.querySelector(".follow-cursor");
+
+let mouseX = 0;
+let mouseY = 0;
+let posX = 0;
+let posY = 0;
+
+// get real mouse position
+document.addEventListener("mousemove", (e)=>{
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+// ultra smooth follow (144hz feel)
+function animate(){
+    posX += (mouseX - posX) * 0.15;
+    posY += (mouseY - posY) * 0.15;
+
+    cursor.style.left = posX + "px";
+    cursor.style.top = posY + "px";
+
+    requestAnimationFrame(animate);
+}
+animate();
 </script>
 
 </body>
