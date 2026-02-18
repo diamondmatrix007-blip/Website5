@@ -137,8 +137,8 @@ html,body{
     <h2 id="username">Welcome</h2>
 
     <button class="btn" onclick="enterSite()">ENTER MATRIX</button>
-    <button class="btn">MEMBERS AREA</button>
-    <button class="btn">ADMIN PANEL</button>
+    <button class="btn"onclick="members()">MEMBERS AREA</button>
+    <button class="btn" onclick="admin()">ADMIN PANEL</button>
 </div>
 
 <div class="music" onclick="toggleMusic()">🎵 Music</div>
@@ -279,7 +279,7 @@ function members(){
 function admin(){
     let pass = prompt("Enter admin password");
 
-    if(pass === "matrix123"){   // change password here
+    if(pass === "6767"){   // change password here
         window.location.href = "admin.html";
     }else if(pass !== null){
         alert("Access denied");
