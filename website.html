@@ -263,5 +263,29 @@ document.addEventListener("mouseleave", ()=>{
 <button class="btn" onclick="members()">MEMBERS AREA</button>
 <button class="btn" onclick="admin()">ADMIN PANEL</button>
 
+<script>
+// ENTER MATRIX → go to main page or dashboard
+function enterSite(){
+    window.location.href = "dashboard.html"; 
+    // change to any page you create
+}
+
+// MEMBERS AREA
+function members(){
+    window.location.href = "members.html";
+}
+
+// ADMIN PANEL (only you)
+function admin(){
+    let pass = prompt("Enter admin password");
+
+    if(pass === "matrix123"){   // change password here
+        window.location.href = "admin.html";
+    }else if(pass !== null){
+        alert("Access denied");
+    }
+}
+</script>
+
 </body>
 </html>
