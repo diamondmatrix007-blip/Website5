@@ -3,176 +3,300 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matrix Dashboard</title>
+<title>MatrixxKinoto Dashboard</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 html,body{
-    margin:0;
-    background:#000;
-    font-family:Orbitron, sans-serif;
-    color:white;
-    overflow:hidden;
+margin:0;
+background:#000;
+font-family:Orbitron,sans-serif;
+color:white;
+overflow-x:hidden;
 }
 
-/* top bar */
-.topbar{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:70px;
-    background:rgba(0,0,0,0.7);
-    backdrop-filter:blur(20px);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 40px;
-    box-shadow:0 0 20px #00ffee44;
+/* particles canvas */
+#particles{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
 }
 
-.logo{
-    font-size:22px;
-    color:#00ffee;
-    text-shadow:0 0 10px #00ffee;
+/* header */
+.header{
+text-align:center;
+padding:25px;
+font-size:28px;
+color:#00ffee;
+text-shadow:0 0 15px cyan;
 }
 
-/* user box */
-.user{
-    display:flex;
-    align-items:center;
-    gap:10px;
+/* sections */
+.section{
+width:90%;
+margin:30px auto;
 }
 
-.user img{
-    width:40px;
-    border-radius:50%;
-    box-shadow:0 0 15px cyan;
+/* upload boxes */
+.box{
+background:rgba(0,0,0,0.6);
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+box-shadow:0 0 20px #00ffee33;
+backdrop-filter:blur(15px);
 }
 
-/* dashboard grid */
-.grid{
-    position:absolute;
-    top:100px;
-    left:50%;
-    transform:translateX(-50%);
-    width:80%;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:25px;
+/* inputs */
+input, textarea{
+width:100%;
+padding:12px;
+margin:8px 0;
+background:#000;
+border:1px solid cyan;
+color:white;
+border-radius:8px;
+font-family:Orbitron;
 }
 
-/* card */
-.card{
-    background:rgba(0,0,0,0.6);
-    padding:30px;
-    border-radius:18px;
-    backdrop-filter:blur(20px);
-    box-shadow:0 0 25px #6a00ff33;
-    text-align:center;
-    transition:0.3s;
+/* buttons */
+button{
+padding:12px 20px;
+background:black;
+border:1px solid cyan;
+color:cyan;
+border-radius:10px;
+cursor:pointer;
+box-shadow:0 0 10px cyan;
+font-family:Orbitron;
+}
+button:hover{
+background:cyan;
+color:black;
 }
 
-.card:hover{
-    transform:translateY(-10px) scale(1.05);
-    box-shadow:0 0 35px cyan;
+/* image posts */
+.post-img{
+margin-top:20px;
+padding:15px;
+border-radius:15px;
+border:1px solid cyan;
+box-shadow:0 0 15px cyan;
 }
 
-.card h2{
-    color:#00ffee;
-    text-shadow:0 0 10px cyan;
+.post-img img{
+max-width:100%;
+border-radius:10px;
+margin-top:10px;
 }
 
-/* glow follower */
-.follow{
-    position:fixed;
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    pointer-events:none;
-    background:cyan;
-    box-shadow:0 0 15px cyan,0 0 40px cyan;
-    z-index:9999;
-    transform:translate(-50%,-50%);
+/* message cards */
+.message{
+margin-top:20px;
+padding:15px;
+border-radius:15px;
+border:1px solid #00ffee;
+box-shadow:0 0 15px #00ffee;
+cursor:pointer;
+}
+
+.title{
+font-size:22px;
+color:cyan;
+margin:5px 0;
+}
+
+.name{
+color:#00ffaa;
+font-size:14px;
+}
+
+/* popup */
+.popup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:black;
+padding:30px;
+border-radius:15px;
+border:1px solid cyan;
+box-shadow:0 0 25px cyan;
+display:none;
+z-index:1000;
+max-width:500px;
+}
+
+/* FOLLOW CURSOR (SAME AS YOUR SITE) */
+.follow-cursor{
+position: fixed;
+width: 18px;
+height: 18px;
+border-radius: 50%;
+pointer-events: none;
+z-index: 9999;
+background: radial-gradient(circle,
+rgba(0,255,170,1) 0%,
+rgba(0,255,170,0.6) 40%,
+rgba(0,255,170,0) 70%);
+box-shadow:0 0 10px #00ffaa,0 0 25px #00ffaa,0 0 35px #00ffaa;
+transform: translate(-50%, -50%);
+mix-blend-mode: screen;
 }
 </style>
 </head>
 
 <body>
 
-<div class="follow"></div>
+<canvas id="particles"></canvas>
+<div class="follow-cursor"></div>
 
-<!-- top bar -->
-<div class="topbar">
-    <div class="logo">⚡ MATRIXxKINOTO</div>
+<div class="header">⚡ MATRIXxKINOTO GLOBAL DASHBOARD</div>
 
-    <div class="user">
-        <img id="avatar">
-        <span id="username">User</span>
-    </div>
+<!-- IMAGE UPLOAD -->
+<div class="section box">
+<h2>Upload Image</h2>
+<input type="text" id="imgName" placeholder="Your name">
+<input type="file" id="imgFile">
+<button onclick="uploadImage()">Upload Image</button>
+<div id="imageFeed"></div>
 </div>
 
-<!-- dashboard cards -->
-<div class="grid">
-
-<div class="card" onclick="openPage('members.html')">
-<h2>Members</h2>
-<p>Private users area</p>
+<!-- MESSAGE POST -->
+<div class="section box">
+<h2>Send Message</h2>
+<input type="text" id="msgName" placeholder="Your name">
+<input type="text" id="msgTitle" placeholder="Title">
+<textarea id="msgText" placeholder="Type message"></textarea>
+<button onclick="sendMsg()">Send</button>
+<div id="msgFeed"></div>
 </div>
 
-<div class="card" onclick="openPage('admin.html')">
-<h2>Admin</h2>
-<p>Control panel</p>
-</div>
-
-<div class="card">
-<h2>Music</h2>
-<p>Coming soon</p>
-</div>
-
-<div class="card">
-<h2>Gallery</h2>
-<p>Upload images soon</p>
-</div>
-
-<div class="card">
-<h2>Chat</h2>
-<p>Realtime chat soon</p>
-</div>
-
-</div>
+<!-- popup -->
+<div class="popup" id="popup"></div>
 
 <script>
-/* discord user */
-const user = JSON.parse(localStorage.getItem("discordUser"));
-if(user){
- document.getElementById("username").innerHTML=user.username;
- document.getElementById("avatar").src="https://cdn.discordapp.com/avatars/"+user.id+"/"+user.avatar+".png";
+/* ===== PARTICLES ===== */
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let parts=[];
+for(let i=0;i<120;i++){
+parts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2,d:Math.random()*1});
 }
 
-/* open page */
-function openPage(page){
- window.location.href = page;
-}
+function draw(){
+ctx.fillStyle="black";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="cyan";
 
-/* glow follow cursor */
-const c=document.querySelector(".follow");
+parts.forEach(p=>{
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fill();
+p.y+=p.d;
+if(p.y>canvas.height){p.y=0;p.x=Math.random()*canvas.width;}
+});
+
+requestAnimationFrame(draw);
+}
+draw();
+
+/* ===== CURSOR FOLLOW (SAME) ===== */
+const cursor=document.querySelector(".follow-cursor");
 let mx=0,my=0,px=0,py=0;
 
-document.addEventListener("mousemove",e=>{
- mx=e.clientX;
- my=e.clientY;
+document.addEventListener("mousemove",(e)=>{
+mx=e.clientX;
+my=e.clientY;
 });
 
 function loop(){
- px += (mx-px)*0.18;
- py += (my-py)*0.18;
- c.style.left=px+"px";
- c.style.top=py+"px";
- requestAnimationFrame(loop);
+px += (mx-px)*0.15;
+py += (my-py)*0.15;
+cursor.style.left=px+"px";
+cursor.style.top=py+"px";
+requestAnimationFrame(loop);
 }
 loop();
+
+/* ===== IMAGE SYSTEM ===== */
+function uploadImage(){
+let name=document.getElementById("imgName").value;
+let file=document.getElementById("imgFile").files[0];
+if(!file||!name)return alert("enter details");
+
+let reader=new FileReader();
+reader.onload=function(e){
+let data=JSON.parse(localStorage.getItem("images")||"[]");
+data.push({name:name,img:e.target.result});
+localStorage.setItem("images",JSON.stringify(data));
+loadImages();
+};
+reader.readAsDataURL(file);
+}
+
+function loadImages(){
+let data=JSON.parse(localStorage.getItem("images")||"[]");
+let feed=document.getElementById("imageFeed");
+feed.innerHTML="";
+data.reverse().forEach(p=>{
+feed.innerHTML+=`
+<div class="post-img">
+<div class="name">Uploaded by ${p.name}</div>
+<img src="${p.img}">
+</div>`;
+});
+}
+loadImages();
+
+/* ===== MESSAGE SYSTEM ===== */
+function sendMsg(){
+let name=document.getElementById("msgName").value;
+let title=document.getElementById("msgTitle").value;
+let text=document.getElementById("msgText").value;
+if(!name||!title||!text)return alert("fill all");
+
+let data=JSON.parse(localStorage.getItem("msgs")||"[]");
+data.push({name,title,text});
+localStorage.setItem("msgs",JSON.stringify(data));
+loadMsgs();
+}
+
+function loadMsgs(){
+let data=JSON.parse(localStorage.getItem("msgs")||"[]");
+let feed=document.getElementById("msgFeed");
+feed.innerHTML="";
+data.reverse().forEach(m=>{
+feed.innerHTML+=`
+<div class="message" onclick="openMsg('${m.title}','${m.text}','${m.name}')">
+<div class="name">${m.name}</div>
+<div class="title">${m.title}</div>
+<div>${m.text.substring(0,80)}...</div>
+</div>`;
+});
+}
+loadMsgs();
+
+function openMsg(title,text,name){
+let pop=document.getElementById("popup");
+pop.style.display="block";
+pop.innerHTML=`
+<h2>${title}</h2>
+<h4>by ${name}</h4>
+<p>${text}</p>
+<br><button onclick="closePop()">Close</button>
+`;
+}
+function closePop(){
+document.getElementById("popup").style.display="none";
+}
 </script>
 
 </body>
